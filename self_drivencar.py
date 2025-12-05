@@ -186,7 +186,11 @@ class Wiper:
     def automatic_wipe(self):
         print("Wipers are now set to automatic mode.")
         print("Let's play your favorite song while driving!")
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> c52aa4e (added airbag deployment)
 if __name__ == "__main__":
     print("MENU")
     print("1. Perform steering manoeuvre")
