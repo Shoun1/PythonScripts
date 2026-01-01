@@ -186,23 +186,19 @@ class Wiper:
     def automatic_wipe(self):
         print("Wipers are now set to automatic mode.")
         print("Let's play your favorite song while driving!")
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> c52aa4e (added airbag deployment)
 if __name__ == "__main__":
     print("MENU")
     print("1. Perform steering manoeuvre")
     print("2. Put on headlights")
     print("Enter your choice (1/2):")
 
-choice = input.lower()
+choice = input().lower()
 
 if choice == 1:
     steering_manoeuvre(car)
 elif choice == 2:
-    print("Headlights are now ON.") = input().lower()
+    print("Headlights are now ON.")
 else:
     print("Invalid choice.")
 
