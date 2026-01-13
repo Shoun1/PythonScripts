@@ -2,7 +2,6 @@
 
 from os import name
 
-
 class Car:
     def __init__(self,speed,brand,color,steering_angle):
         self.speed = speed
@@ -52,7 +51,7 @@ def airbags_burstout(event_id):
         airbag.burst()
         airbag.shrink()
         print("Passenger rescued")
-        return True
+        return 
 
     return False
 
@@ -71,7 +70,7 @@ class Accelerator():
     def stay(self):
         print("Car is maintaining speed at {} km/h".format(self.acceleration))
 
-#devise a logic to indicate an accident
+#devise a logic to evaluate impact score of an accident
 class Accident():
 
     #define scoring functions
@@ -94,6 +93,125 @@ class Accident():
 
         impact = (v_weight * s_score * f_score * c_factor) * 100
         return round(impact, 2)
+
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def enqueue(self, item):
+        self.items.append(item)
+    
+    def dequeue(self):
+        if not self.is_empty():
+            return self.items.pop(0)
+        return None
+    
+    def display(self):
+        return self.items
+    
+    def is_empty(self):
+        return len(self.items) == 0
+
+
+class Wheel:
+    def __init__(self, position):
+        self.position = position
+        self.speed = 0
+        self.pressure = 30  # default pressure
+        self.wear = 0.0     # default wear
+        self.punctured = False
+
+#class to define chasssis as a skeletal structure
+class Chassis:
+    def __init__(self, material, type, min_speed=0):
+        self.material = material
+        self.type = type
+        self.wheels = []  # list of Wheel objects
+        self.tyre_check_queue = Queue()  # queue for tyre checks
+        self.min_speed = min_speed  # minimum speed for wheel check
+        
+    #method to attach wheels
+    def attach_wheels(self, wheel_data_list):
+        for i, data in enumerate(wheel_data_list):
+            wheel = Wheel(f"W{i+1}")
+            wheel.speed = data['speed']
+            wheel.pressure = data['pressure']
+            wheel.wear = data['wear']
+            self.wheels.append(wheel)
+            self.tyre_check_queue.enqueue(wheel)  # enqueue for check
+        
+    #method to check tyres using queue
+    def check_tyres(self):
+        print("Checking tyres in queue order...")
+        while not self.tyre_check_queue.is_empty():
+            wheel = self.tyre_check_queue.dequeue()
+            self.inspect_wheel(wheel)
+    
+    def inspect_wheel(self, wheel):
+        # Simulate inspection
+        issues = []
+        if wheel.pressure < 28:
+            issues.append(f"Low pressure: {wheel.pressure}")
+        if wheel.wear > 0.5:
+            issues.append(f"High wear: {wheel.wear}")
+        if wheel.speed < self.min_speed:
+            issues.append(f"Speed below min: {wheel.speed} < {self.min_speed}")
+        
+        if issues:
+            wheel.punctured = True
+            print(f"{wheel.position}: Issues detected - {', '.join(issues)}")
+        else:
+            print(f"{wheel.position}: OK - Pressure: {wheel.pressure}, Wear: {wheel.wear}, Speed: {wheel.speed}")
+        
+    #method to swap wheels as per user requirement
+    def swap_wheels(self, old_wheel_index, new_wheel_dict):
+        if not (0 <= old_wheel_index < len(self.wheels)):
+            print("Invalid wheel index for swap.")
+            return
+        
+        # Check synchronicity
+        tolerance = 0.05
+        speeds = [w.speed for w in self.wheels]
+        pressures = [w.pressure for w in self.wheels]
+        wears = [w.wear for w in self.wheels]
+        
+        avg_speed = sum(speeds) / len(speeds) if speeds else 0
+        avg_pressure = sum(pressures) / len(pressures) if pressures else 0
+        avg_wear = sum(wears) / len(wears) if wears else 0
+
+        is_synchronous = {
+            "speed": all([abs(w.speed - avg_speed) / avg_speed <= tolerance if avg_speed > 0 else True for w in self.wheels]),
+            "pressure": all([abs(w.pressure - avg_pressure) / avg_pressure <= tolerance if avg_pressure > 0 else True for w in self.wheels]),
+            "wear": all([abs(w.wear - avg_wear) / avg_wear <= tolerance if avg_wear > 0 else True for w in self.wheels])
+        }
+
+        if not all(is_synchronous.values()):
+            # Perform swap
+            old_wheel = self.wheels[old_wheel_index]
+            new_wheel = Wheel(old_wheel.position)
+            new_wheel.speed = new_wheel_dict['speed']
+            new_wheel.pressure = new_wheel_dict['pressure']
+            new_wheel.wear = new_wheel_dict['wear']
+            self.wheels[old_wheel_index] = new_wheel
+            print("Wheels were not synchronous. Automatic swap performed.")
+            print("Wheels are now synchronized after swap.")
+            # Re-enqueue for check after swap
+            self.tyre_check_queue = Queue()  # reset queue
+            for w in self.wheels:
+                self.tyre_check_queue.enqueue(w)
+        else:
+            print("Wheels are working synchronously.")
+
+
+    #open sun-roof method
+    def open_sunroof(self,chassis_button):
+        #chassis_button on car dashboard: "turn_on" or "turn_off"
+        if chassis_button == "turn_on":
+            print("Sunroof is now OPEN.")
+        elif chassis_button == "turn_off":
+            print("Sunroof is now CLOSED.")
+        else:
+            print("Invalid command for sunroof.")
 
 if __name__ == "__main__":    
     #calculate impact formula based on vehicle in video
@@ -136,6 +254,26 @@ if __name__ == "__main__":
         print("External damage. Minor dents, repaint.")
     else:
         print("Light impact. Cosmetic repair only.")
+
+    Chassis1 = Chassis("Aluminum", "Sedan", min_speed=50)
+
+    Chassis1.attach_wheels([
+        {"speed": 60, "pressure": 32, "wear": 0.1},
+        {"speed": 61, "pressure": 31, "wear": 0.1},
+        {"speed": 70, "pressure": 33, "wear": 0.1},
+        {"speed": 60, "pressure": 32, "wear": 0.1}
+    ])
+    
+    # Check tyres after attaching
+    Chassis1.check_tyres()
+    
+    Chassis1.open_sunroof("turn_on")
+
+    new_wheel_dict = {"speed": 62, "pressure": 32, "wear": 0.05}
+    Chassis1.swap_wheels(2, new_wheel_dict)
+    
+    # Check tyres again after swap
+    Chassis1.check_tyres()
 
 
 '''if __name__ == "__main__":
