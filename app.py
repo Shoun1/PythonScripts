@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, send_file
-from PythonScripts.self_drivencar import Accelerator,Accident, airbags_burstout
+from self_drivencar import Accelerator, Accident
 import cv2
 import os
+
+from self_drivencar import Chassis
 
 app = Flask(__name__)
 
@@ -110,5 +112,34 @@ def accident_impact_api():
         'feedback': feedback
     }), 200
     
+@app.route('/chassis_status', methods=['GET'])
+def chassis_status_api():
+    chassis_material = {
+        "aluminum": "lightweight and corrosion-resistant",
+        "steel": "strong and durable",
+        "carbon_fiber": "extremely lightweight and strong"
+    }
+
+    vehicle_type = "suv" 
+    Chassis1 = Chassis("Aluminum", vehicle_type, min_speed=50)
+
+    #attach wheels
+    Chassis1.attach_wheels([
+        {"speed": 60, "pressure": 32, "wear": 0.1},
+        {"speed": 61, "pressure": 31, "wear": 0.1},
+        {"speed": 70, "pressure": 33, "wear": 0.1},
+        {"speed": 60, "pressure": 32, "wear": 0.1}
+    ])
+    
+    power = Chassis1.power_transmission(100, 0.9, 60)  # example torque, efficiency, speed
+    Chassis1.check_tyres(power)
+
+    return jsonify({
+        'chassis_material': chassis_material.get(Chassis1.material.lower(), "unknown material"),
+        'vehicle_type': Chassis1.type,
+        'wheels_attached': len(Chassis1.wheels)
+    }), 200
+
+
 if __name__ == '__main__':
     app.run(debug=True)

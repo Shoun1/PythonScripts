@@ -38,7 +38,7 @@ class Car:
 '''def turn_on_headlights():print("Headlights are now ON.")'''
 
 
-class Airbag:
+'''class Airbag:
     def burst(self):
         print("Airbag deployed")
 
@@ -53,7 +53,7 @@ def airbags_burstout(event_id):
         print("Passenger rescued")
         return 
 
-    return False
+    return False'''
 
 class Accelerator():
     def __init__(self,acceleration):
@@ -137,18 +137,39 @@ class Chassis:
             wheel.speed = data['speed']
             wheel.pressure = data['pressure']
             wheel.wear = data['wear']
+            wheel.power = 0
             self.wheels.append(wheel)
             self.tyre_check_queue.enqueue(wheel)  # enqueue for check
         
     #method to check tyres using queue
-    def check_tyres(self):
+    def check_tyres(self, power_output=0):
         print("Checking tyres in queue order...")
         while not self.tyre_check_queue.is_empty():
             wheel = self.tyre_check_queue.dequeue()
-            self.inspect_wheel(wheel)
-    
-    def inspect_wheel(self, wheel):
+            self.inspect_wheel(wheel, power_output)
+
+    def inspect_wheel(self, wheel, power_output):
+        if power_output is None:
+            power_output = 0
         # Simulate inspection
+        if power_output > 0 and power_output < 5000:
+            wheel.power = power_output / 4  # distribute power equally
+
+        if power_output > 1500:
+            print("Wheels are in close mechanical control of the chassis")
+
+        elif power_output <= 1500:
+            print("Wheels are not as responsive to chassis control")
+
+        elif power_output == 0:
+            print("Wheels are not receiving power from chassis")
+
+        elif wheel.power_output > 4000:
+            print("Wheels are overpowered, risk of skidding!")
+
+        else:
+            print("Wheels are functioning normally under power transmission.")
+
         issues = []
         if wheel.pressure < 28:
             issues.append(f"Low pressure: {wheel.pressure}")
@@ -213,6 +234,31 @@ class Chassis:
         else:
             print("Invalid command for sunroof.")
 
+
+    #facilitate ease of power transmission
+    def power_transmission(self,mechanical_torque, efficiency, wheel_speed):
+
+        if self.type == "Sedan":
+            power_output = mechanical_torque * efficiency * wheel_speed * 0.9
+        elif self.type == "SUV":
+            power_output = mechanical_torque * efficiency * wheel_speed * 1.1
+        else:
+            power_output = mechanical_torque * efficiency * wheel_speed * 1.0
+
+
+        #minimum speed check before power transmission
+        for wheel in self.wheels:
+            if wheel.speed < self.min_speed:
+                print(f"Warning: {wheel.position} speed {wheel.speed} km/h is below minimum required {self.min_speed} km/h for power transmission.")
+                return None  # return None if check fails
+
+        #transmit power to wheels
+        for wheel in self.wheels:
+            wheel.power = power_output / len(self.wheels)
+            print(f"Wheel {wheel.position} receives power: {wheel.power}")
+
+        return power_output
+    
 if __name__ == "__main__":    
     #calculate impact formula based on vehicle in video
     #define vehicle type weights and collision factors
@@ -255,49 +301,53 @@ if __name__ == "__main__":
     else:
         print("Light impact. Cosmetic repair only.")
 
-    Chassis1 = Chassis("Aluminum", "Sedan", min_speed=50)
+    #Chassis1 = Chassis("Aluminum", "Sedan", min_speed=50)
 
-    Chassis1.attach_wheels([
+    '''Chassis1.attach_wheels([
         {"speed": 60, "pressure": 32, "wear": 0.1},
         {"speed": 61, "pressure": 31, "wear": 0.1},
         {"speed": 70, "pressure": 33, "wear": 0.1},
         {"speed": 60, "pressure": 32, "wear": 0.1}
-    ])
+    ])'''
     
     # Check tyres after attaching
-    Chassis1.check_tyres()
-    
-    Chassis1.open_sunroof("turn_on")
+    #power = Chassis1.power_transmission(100, 0.9, 60)  # example torque, efficiency, speed
+    #Chassis1.check_tyres(power)
 
-    new_wheel_dict = {"speed": 62, "pressure": 32, "wear": 0.05}
+    # Chassis1.open_sunroof("turn_on")
+
+    '''new_wheel_dict = {"speed": 62, "pressure": 32, "wear": 0.05}
     Chassis1.swap_wheels(2, new_wheel_dict)
     
     # Check tyres again after swap
-    Chassis1.check_tyres()
+    power = Chassis1.power_transmission(100, 0.9, 60)  # recalculate after swap
+    Chassis1.check_tyres(power)
 
+    #power transmission example
+    Chassis1.power_transmission(mechanical_torque=500, efficiency=0.55, wheel_speed=120)'''
 
-'''if __name__ == "__main__":
-    cars_list = ["Skoda","Jaguar","Lamborghini","Ferrari","Porsche","Amaze","City","Ameo"]
-    prices_list = [2_000_000, 5_000_000, 5_000_000, 6_000_000, 7_000_000]
-    print("Enter the brand of car you want to buy from the following list:")
-    print(cars_list)
-    user_choice = input()
-    if user_choice in cars_list:
-        index = cars_list.index(user_choice)
-        print("The price of the {} is: {}".format(user_choice,prices_list[index]))
-        print("Do you want to buy it? (yes/no)")
-        buy_choice = input().lower()
-        if buy_choice == "yes":
-            print("Congratulations on your new {}!".format(user_choice))
-        else:
-            print("Thank you for visiting our dealership.")
-        car = Car(0,user_choice,"Red",0)
+# if __name__ == "__main__":
+#     cars_list = ["Skoda","Jaguar","Lamborghini","Ferrari","Porsche","Amaze","City","Ameo"]
+#     prices_list = [2_000_000, 5_000_000, 5_000_000, 6_000_000, 7_000_000]
+#     print("Enter the brand of car you want to buy from the following list:")
+#     print(cars_list)
+#     user_choice = input()
+#     if user_choice in cars_list:
+#         index = cars_list.index(user_choice)
+#         print("The price of the {} is: {}".format(user_choice,prices_list[index]))
+#         print("Do you want to buy it? (yes/no)")
+#         buy_choice = input().lower()
+#         if buy_choice == "yes":
+#             print("Congratulations on your new {}!".format(user_choice))
+#         else:
+#             print("Thank you for visiting our dealership.")
+#         car = Car(0,user_choice,"Red",0)
 
-    acc=Accelerator(0)
-    acc.push()
-    acc.stay()
-    acc.release()
-class Stereo:
+#     acc=Accelerator(0)
+#     acc.push()
+#     acc.stay()
+#     acc.release()
+'''class Stereo:
     def __init__(self,volume):
         self.volume = volume
         self.default_mode = "AUX"
@@ -346,12 +396,12 @@ car_length_meters = 4.5  # length of the car in meters
 #define a source function using dijkstra's algorithm
 print("Calculating shortest paths using Dijkstra's algorithm...")
 print("Enter source map gps coordinates:")
-src_coordinate1,src_coordinate2 = input()
-print(:"Enter destination map gps coordinates:")
-dst_coordinate1,dst_coordinate2 = input()
+src_coordinate1, src_coordinate2 = input().split(',')
+print("Enter destination map gps coordinates:")
+dst_coordinate1, dst_coordinate2 = input().split(',')
 def dijkstra(src_coordinate, dst_coordinate, graph):
     shortest_distances = {node: float('inf') for node in graph}
-    shortest_distances[start] = 0
+    shortest_distances[src_coordinate] = 0
     visited = set()
     while len(visited) < len(graph):
         current_node = min((node for node in graph if node not in visited), key=lambda node: shortest_distances[node])
