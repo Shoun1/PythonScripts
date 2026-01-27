@@ -120,7 +120,7 @@ def chassis_status_api():
         "carbon_fiber": "extremely lightweight and strong"
     }
 
-    vehicle_type = "suv" 
+    vehicle_type = request.args.get('vehicle_type', 'sedan').lower()   
     Chassis1 = Chassis("Aluminum", vehicle_type, min_speed=50)
 
     #attach wheels
@@ -131,13 +131,27 @@ def chassis_status_api():
         {"speed": 60, "pressure": 32, "wear": 0.1}
     ])
     
-    power = Chassis1.power_transmission(100, 0.9, 60)  # example torque, efficiency, speed
+    mechanical_torque = request.args.get('torque', default=100, type=float)
+    efficiency = request.args.get('efficiency', default=0.9, type=float)
+    #get wheel speed from wheel class
+
+    #define list comprehension to get speeds of all wheels and calculate average
+    avg_speed = sum(wheel.speed for wheel in Chassis1.wheels) / len(Chassis1.wheels)
+    power = Chassis1.power_transmission(mechanical_torque, efficiency, avg_speed)  # example torque, efficiency, speed
+    
+    #inspect tyres checking each wheel with the calculated power
     Chassis1.check_tyres(power)
+
+    #swap a wheel example
+    new_wheel_dict = {"speed": 62, "pressure": 32, "wear": 0.05}
+    Chassis1.swap_wheels(2, new_wheel_dict)
 
     return jsonify({
         'chassis_material': chassis_material.get(Chassis1.material.lower(), "unknown material"),
         'vehicle_type': Chassis1.type,
-        'wheels_attached': len(Chassis1.wheels)
+        'wheels_attached': len(Chassis1.wheels),
+        'power_transmitted': f"{power} watts",
+        "swapped_wheel_index": 2,
     }), 200
 
 

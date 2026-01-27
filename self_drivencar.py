@@ -153,6 +153,7 @@ class Chassis:
             power_output = 0
         # Simulate inspection
         if power_output > 0 and power_output < 5000:
+            #set the power attribute of wheel   
             wheel.power = power_output / 4  # distribute power equally
 
         if power_output > 1500:
@@ -164,7 +165,7 @@ class Chassis:
         elif power_output == 0:
             print("Wheels are not receiving power from chassis")
 
-        elif wheel.power_output > 4000:
+        elif power_output > 4000:
             print("Wheels are overpowered, risk of skidding!")
 
         else:
@@ -301,31 +302,8 @@ if __name__ == "__main__":
     else:
         print("Light impact. Cosmetic repair only.")
 
-    #Chassis1 = Chassis("Aluminum", "Sedan", min_speed=50)
-
-    '''Chassis1.attach_wheels([
-        {"speed": 60, "pressure": 32, "wear": 0.1},
-        {"speed": 61, "pressure": 31, "wear": 0.1},
-        {"speed": 70, "pressure": 33, "wear": 0.1},
-        {"speed": 60, "pressure": 32, "wear": 0.1}
-    ])'''
-    
-    # Check tyres after attaching
-    #power = Chassis1.power_transmission(100, 0.9, 60)  # example torque, efficiency, speed
-    #Chassis1.check_tyres(power)
-
-    # Chassis1.open_sunroof("turn_on")
-
     '''new_wheel_dict = {"speed": 62, "pressure": 32, "wear": 0.05}
-    Chassis1.swap_wheels(2, new_wheel_dict)
-    
-    # Check tyres again after swap
-    power = Chassis1.power_transmission(100, 0.9, 60)  # recalculate after swap
-    Chassis1.check_tyres(power)
-
-    #power transmission example
-    Chassis1.power_transmission(mechanical_torque=500, efficiency=0.55, wheel_speed=120)'''
-
+    Chassis1.swap_wheels(2, new_wheel_dict)'''
 # if __name__ == "__main__":
 #     cars_list = ["Skoda","Jaguar","Lamborghini","Ferrari","Porsche","Amaze","City","Ameo"]
 #     prices_list = [2_000_000, 5_000_000, 5_000_000, 6_000_000, 7_000_000]
